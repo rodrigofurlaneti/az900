@@ -21,6 +21,11 @@ $uri = "https://prices.azure.com/api/retail/prices?currencyCode='USD'&`$filter=a
 az vm list-skus --size Standard_B2s --all --query "[?name=='Standard_B2s' && length(restrictions) == \`0\`].locations[0]" -o table
 ```
 
+## Passo 3: Consultar regiões que suportam Desligamento Automático
+```bash
+az provider show --namespace Microsoft.DevTestLab --query "resourceTypes[?resourceType=='schedules'].locations | [0]" -o tsv
+```
+
 # Parte 2: Criação da Infraestrutura (Execução)
 # Definindo Variáveis para não ter que digitar repetido (Altere se necessário)
 ```bash
