@@ -1,7 +1,19 @@
 # Parte 1: Consultas Prévias (Preparação)
 ## Passo 1: Consultar o Top 5 regiões mais baratas globalmente (Versão Bash)
+
+Linux
 ```bash
 curl -s "https://prices.azure.com/api/retail/prices?currencyCode='USD'&\$filter=armSkuName%20eq%20'Standard_B2s'%20and%20priceType%20eq%20'Consumption'" | jq -r '.Items[] | select(.productName | contains("Windows") | not) | select(.productName | contains("Spot") | not) | "\(.armRegionName) \(.retailPrice)"' | sort -k2 -n | head -n 5
+```
+
+Windows
+```bash
+$uri = "https://prices.azure.com/api/retail/prices?currencyCode='USD'&`$filter=armSkuName%20eq%20'Standard_B2s'%20and%20priceType%20eq%20'Consumption'"
+(Invoke-RestMethod -Uri $uri).Items | 
+    Where-Object { $_.productName -notmatch "Windows" -and $_.productName -notmatch "Spot" } | 
+    Sort-Object retailPrice | 
+    Select-Object armRegionName, retailPrice -First 5 | 
+    Format-Table
 ```
 
 ## Passo 2: Consultar quais regiões estão liberadas na SUA assinatura
