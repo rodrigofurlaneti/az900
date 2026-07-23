@@ -27,7 +27,7 @@ az provider show --namespace Microsoft.DevTestLab --query "resourceTypes[?resour
 ```
 
 # Parte 2: Criação da Infraestrutura (Execução)
-# Definindo Variáveis para não ter que digitar repetido (Altere se necessário)
+# Definindo Variáveis para não ter que digitar repetido (Altere se necessário) Variáveis
 ```bash
 REGIAO="denmarkeast"
 RG="RG-App-Novo"
@@ -36,75 +36,34 @@ VNET="vnet-denmark-b"
 SUBNET="snet-denmark-b"
 ```
 
-# Passo 3: Criar o grupo de recurso
+# 2. Criar Grupo de Recursos
 ```bash
 az group create --name $RG --location $REGIAO
 ```
 
-# Passo 4: Criar a Rede Virtual e a Sub-rede
+# 3. Criar Rede
 ```bash
-az network vnet create \
-    --resource-group $RG \
-    --name $VNET \
-    --location $REGIAO \
-    --address-prefix 172.16.0.0/16 \
-    --subnet-name $SUBNET \
-    --subnet-prefix 172.16.0.0/24
+az network vnet create --resource-group $RG --name $VNET --location $REGIAO --address-prefix 172.16.0.0/16 --subnet-name $SUBNET --subnet-prefix 172.16.0.0/24
 ```
 
-# Passo 5: Criar a Máquina Virtual (Standard_B2s) e sem IP Público inicialmente
+# 4. Criar a Máquina Virtual (Agora usando a Standard_B1s)
 ```bash
-az vm create \
-    --resource-group $RG \
-    --name $VM_NOME \
-    --location $REGIAO \
-    --size Standard_B2s \
-    --image Ubuntu2204 \
-    --admin-username azureuser \
-    --generate-ssh-keys \
-    --vnet-name $VNET \
-    --subnet $SUBNET \
-    --public-ip-address ""
+az vm create --resource-group $RG --name $VM_NOME --location $REGIAO --size Standard_B1s --image Ubuntu2204 --admin-username azureuser --generate-ssh-keys --vnet-name $VNET --subnet $SUBNET --public-ip-address ""
 ```
 
-# Passo 6: Configurar o Desligamento Automático para Economizar (ex: 16:00 UTC)
+# 5. Criar a Regra de Desligamento (Fixo em eastus)
 ```bash
-az vm auto-shutdown \
-    --resource-group $RG \
-    --name $VM_NOME \
-    --time 1600 \
-    --location eastus
+az vm auto-shutdown --resource-group $RG --name $VM_NOME --time 1600 --location eastus
 ```
 
-# Passo 7: Criar o IP Público
+# 6. Configurar IP e Portas
 ```bash
-az network public-ip create \
-    --resource-group $RG \
-    --name ${VM_NOME}-PublicIP \
-    --location $REGIAO \
-    --allocation-method Static \
-    --sku Basic
+az network public-ip create --resource-group $RG --name ${VM_NOME}-PublicIP --location $REGIAO --allocation-method Static --sku Basic
+az network nic ip-config update --resource-group $RG --nic-name ${VM_NOME}VMNic --name ipconfig1 --public-ip-address ${VM_NOME}-PublicIP
+az network nsg rule create --resource-group $RG --nsg-name ${VM_NOME}NSG --name Allow_APIs_80_85 --protocol Tcp --priority 100 --destination-port-ranges 80-85 --source-address-prefixes '*' --access Allow --direction Inbound
 ```
 
-# Passo 8: Associar o IP Público à Placa de Rede da sua VM
+# 7. Pegar o IP para você conectar
 ```bash
-az network nic ip-config update \
-    --resource-group $RG \
-    --nic-name ${VM_NOME}VMNic \
-    --name ipconfig1 \
-    --public-ip-address ${VM_NOME}-PublicIP
-```
-
-# Passo 9: Liberar as Portas de 80 a 85 no Firewall (NSG)
-```bash
-az network nsg rule create \
-    --resource-group $RG \
-    --nsg-name ${VM_NOME}NSG \
-    --name Allow_APIs_80_85 \
-    --protocol Tcp \
-    --priority 100 \
-    --destination-port-ranges 80-85 \
-    --source-address-prefixes '*' \
-    --access Allow \
-    --direction Inbound
+az network public-ip show --resource-group $RG --name ${VM_NOME}-PublicIP --query ipAddress --output tsv
 ```
