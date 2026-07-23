@@ -56,14 +56,27 @@ az vm create --resource-group $RG --name $VM_NOME --location $REGIAO --size Stan
 az vm auto-shutdown --resource-group $RG --name $VM_NOME --time 1600 --location eastus
 ```
 
-# 6. Configurar IP e Portas
+# 6. Criar o IP Público no formato Standard
 ```bash
-az network public-ip create --resource-group $RG --name ${VM_NOME}-PublicIP --location $REGIAO --allocation-method Static --sku Basic
+az network public-ip create --resource-group $RG --name ${VM_NOME}-PublicIP --location $REGIAO --allocation-method Static --sku Standard
+```
+
+# 7. Associar o novo IP à Placa de Rede da sua VM
+```bash
 az network nic ip-config update --resource-group $RG --nic-name ${VM_NOME}VMNic --name ipconfig1 --public-ip-address ${VM_NOME}-PublicIP
+```
+
+# 8. Libera as Portas 80 a 85 protocolo HTTP
+```bash
 az network nsg rule create --resource-group $RG --nsg-name ${VM_NOME}NSG --name Allow_APIs_80_85 --protocol Tcp --priority 100 --destination-port-ranges 80-85 --source-address-prefixes '*' --access Allow --direction Inbound
 ```
 
-# 7. Pegar o IP para você conectar
+# 9. Mostrar o IP na tela para você conectar!
+```bash
+az network public-ip show --resource-group $RG --name ${VM_NOME}-PublicIP --query ipAddress --output tsv
+```
+
+# 9. Pegar o IP para você conectar
 ```bash
 az network public-ip show --resource-group $RG --name ${VM_NOME}-PublicIP --query ipAddress --output tsv
 ```
