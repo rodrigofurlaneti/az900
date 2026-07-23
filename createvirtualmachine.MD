@@ -11,28 +11,28 @@ flowchart TD
 
     subgraph Fase1 [Parte 1: Consultas Prévias e Preparação]
         direction TB
-        A[/Passo 1: Consultar Top 5 Regiões Mais Baratas API/ ]:::preparacao
-        B[/Passo 2: Consultar Regiões Liberadas na Assinatura CLI/ ]:::preparacao
-        C[/Passo 3: Consultar Suporte a Desligamento Automático/ ]:::preparacao
-        D{Cruzar Dados e Definir Variáveis<br>Ex: VM na Dinamarca, Shutdown em EastUS}:::preparacao
+        A["Passo 1: Consultar Top 5 Regiões Mais Baratas API"]:::preparacao
+        B["Passo 2: Consultar Regiões Liberadas na Assinatura CLI"]:::preparacao
+        C["Passo 3: Consultar Suporte a Desligamento Automático"]:::preparacao
+        D{"Cruzar Dados e Definir Variáveis (Ex: VM na Dinamarca)"}:::preparacao
         
         A --> B --> C --> D
     end
 
     subgraph Fase2 [Parte 2: Execução da Infraestrutura]
         direction TB
-        E(Passo 2: Criar Resource Group)
-        F(Passo 3: Criar Virtual Network e Subnet)
-        G(Passo 4: Criar Máquina Virtual B1s<br>Sem IP Público)
-        H(Passo 5: Criar Regra de Desligamento<br>Fixo na região com suporte)
-        I(Passo 6: Criar IP Público Standard)
-        J(Passo 7: Obter Nome da NIC Dinâmica<br>e Associar o IP Público)
-        K(Passo 8: Criar Regra NSG<br>Liberar Portas 80 a 85)
+        E("Passo 2: Criar Resource Group")
+        F("Passo 3: Criar Virtual Network e Subnet")
+        G("Passo 4: Criar Máquina Virtual B1s (Sem IP Público)")
+        H("Passo 5: Criar Regra de Desligamento (Fixo em eastus)")
+        I("Passo 6: Criar IP Público Standard")
+        J("Passo 7: Obter Nome da NIC Dinâmica e Associar IP Público")
+        K("Passo 8: Criar Regra NSG (Liberar Portas 80 a 85)")
         
         E --> F --> G --> H --> I --> J --> K
     end
 
-    L(((Passo 9: Exibir IP Final<br>Acesso SSH Liberado))):::final
+    L(("Passo 9: Exibir IP Final (Acesso SSH Liberado)")):::final
 
     D -->|Inicia Criação| E
     K --> L
