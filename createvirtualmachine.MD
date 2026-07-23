@@ -1,67 +1,69 @@
-# Passo 1: Criar o grupo de recurso
-```bash
-az group create --name ResourceGroup --location eastus
-```
+# Parte 1: Consultas Prévias (Preparação)
+## Passo 1: Consultar o Top 5 regiões mais baratas globalmente (Versão Bash)
+curl -s "https://prices.azure.com/api/retail/prices?currencyCode='USD'&\$filter=armSkuName%20eq%20'Standard_B2s'%20and%20priceType%20eq%20'Consumption'" | jq -r '.Items[] | select(.productName | contains("Windows") | not) | select(.productName | contains("Spot") | not) | "\(.armRegionName) \(.retailPrice)"' | sort -k2 -n | head -n 5
 
-# Passo 2: Criar a Rede Virtual e a Sub-rede
-```bash
+## Passo 2: Consultar quais regiões estão liberadas na SUA assinatura
+az vm list-skus --size Standard_B2s --all --query "[?name=='Standard_B2s' && length(restrictions) == \`0\`].locations[0]" -o table
+
+# Parte 2: Criação da Infraestrutura (Execução)
+# Definindo Variáveis para não ter que digitar repetido (Altere se necessário)
+REGIAO="eastus3"
+RG="RG-App-Novo"
+VM_NOME="VirtualMachine"
+VNET="vnet-eastus-b"
+SUBNET="snet-eastus-b"
+
+# Passo 3: Criar o grupo de recurso
+az group create --name $RG --location $REGIAO
+
+# Passo 4: Criar a Rede Virtual e a Sub-rede
 az network vnet create \
-    --resource-group ResourceGroup \
-    --name vnet-eastus-b \
-    --location eastus \
+    --resource-group $RG \
+    --name $VNET \
+    --location $REGIAO \
     --address-prefix 172.16.0.0/16 \
-    --subnet-name snet-eastus-b \
+    --subnet-name $SUBNET \
     --subnet-prefix 172.16.0.0/24
-```
 
-# Passo 3: Criar a Máquina Virtual com a Série Econômica (Standard_B2s) e sem IP Público
-```bash
+# Passo 5: Criar a Máquina Virtual (Standard_B2s) e sem IP Público inicialmente
 az vm create \
-    --resource-group ResourceGroup \
-    --name VirtualMachine \
-    --location eastus \
+    --resource-group $RG \
+    --name $VM_NOME \
+    --location $REGIAO \
     --size Standard_B2s \
     --image Ubuntu2204 \
     --admin-username azureuser \
     --generate-ssh-keys \
-    --vnet-name vnet-eastus-b \
-    --subnet snet-eastus-b \
+    --vnet-name $VNET \
+    --subnet $SUBNET \
     --public-ip-address ""
-```
 
-# Passo 4: Configurar o Desligamento Automático para Economizar (ex: 16:00)
-```bash
+# Passo 6: Configurar o Desligamento Automático para Economizar (ex: 16:00 UTC)
 az vm auto-shutdown \
-    --resource-group ResourceGroup \
-    --name VirtualMachine \
+    --resource-group $RG \
+    --name $VM_NOME \
     --time 1600 \
-    --location eastus
-```
+    --location $REGIAO
 
-# Passo 5: Criar o IP Público
-```bash
+# Passo 7: Criar o IP Público
 az network public-ip create \
-    --resource-group ResourceGroup \
-    --name VirtualMachine-PublicIP \
-    --location eastus \
+    --resource-group $RG \
+    --name ${VM_NOME}-PublicIP \
+    --location $REGIAO \
     --allocation-method Static \
     --sku Basic
-```
 
-# Passo 6: Associar o IP Público à Placa de Rede da sua VM
-```bash
+# Passo 8: Associar o IP Público à Placa de Rede da sua VM
 az network nic ip-config update \
-    --resource-group ResourceGroup \
-    --nic-name VirtualMachineVMNic \
+    --resource-group $RG \
+    --nic-name ${VM_NOME}VMNic \
     --name ipconfig1 \
-    --public-ip-address VirtualMachine-PublicIP
-```
+    --public-ip-address ${VM_NOME}-PublicIP
 
-# Passo 7: Liberar as Portas de 80 a 85 no Firewall (NSG)
-```bash
+# Passo 9: Liberar as Portas de 80 a 85 no Firewall (NSG)
 az network nsg rule create \
-    --resource-group ResourceGroup \
-    --nsg-name VirtualMachineNSG \
+    --resource-group $RG \
+    --nsg-name ${VM_NOME}NSG \
     --name Allow_APIs_80_85 \
     --protocol Tcp \
     --priority 100 \
@@ -69,5 +71,3 @@ az network nsg rule create \
     --source-address-prefixes '*' \
     --access Allow \
     --direction Inbound
-```
-
