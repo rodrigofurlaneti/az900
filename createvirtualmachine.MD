@@ -73,7 +73,7 @@ az vm auto-shutdown \
     --resource-group $RG \
     --name $VM_NOME \
     --time 1600 \
-    --location $REGIAO
+    --location eastus
 ```
 
 # Passo 7: Criar o IP Público
