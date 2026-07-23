@@ -18,7 +18,7 @@ $uri = "https://prices.azure.com/api/retail/prices?currencyCode='USD'&`$filter=a
 
 ## Passo 2: Consultar quais regiões estão liberadas na SUA assinatura
 ```bash
-az vm list-skus --size Standard_B1s --all --query "[?name=='Standard_B1s' && length(restrictions) == \`0\`].locations[0]" -o table
+az vm list-skus --size Standard_B2s --all --query "[?name=='Standard_B2s' && length(restrictions) == \`0\`].locations[0]" -o table
 ```
 
 ## Passo 3: Consultar regiões que suportam Desligamento Automático
