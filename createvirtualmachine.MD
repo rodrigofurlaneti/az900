@@ -4,10 +4,10 @@ Abaixo está o fluxo completo de criação do nosso ambiente no Azure:
 
 ```mermaid
 flowchart TD
-    %% Estilos de nós para destacar categorias
-    classDef preparacao fill:#f9f2f4,stroke:#d9534f,stroke-width:2px;
-    classDef execucao fill:#eafaf1,stroke:#5cb85c,stroke-width:2px;
-    classDef final fill:#d9edf7,stroke:#337ab7,stroke-width:2px;
+    %% Estilos de nós forçando a cor do texto para preto (color:#000000) para funcionar no Dark Mode
+    classDef preparacao fill:#f9f2f4,stroke:#d9534f,stroke-width:2px,color:#000000;
+    classDef execucao fill:#eafaf1,stroke:#5cb85c,stroke-width:2px,color:#000000;
+    classDef final fill:#d9edf7,stroke:#337ab7,stroke-width:2px,color:#000000;
 
     subgraph Fase1 [Parte 1: Consultas Prévias e Preparação]
         direction TB
@@ -21,13 +21,13 @@ flowchart TD
 
     subgraph Fase2 [Parte 2: Execução da Infraestrutura]
         direction TB
-        E("Passo 2: Criar Resource Group")
-        F("Passo 3: Criar Virtual Network e Subnet")
-        G("Passo 4: Criar Máquina Virtual B1s (Sem IP Público)")
-        H("Passo 5: Criar Regra de Desligamento (Fixo em eastus)")
-        I("Passo 6: Criar IP Público Standard")
-        J("Passo 7: Obter Nome da NIC Dinâmica e Associar IP Público")
-        K("Passo 8: Criar Regra NSG (Liberar Portas 80 a 85)")
+        E("Passo 2: Criar Resource Group"):::execucao
+        F("Passo 3: Criar Virtual Network e Subnet"):::execucao
+        G("Passo 4: Criar Máquina Virtual B1s (Sem IP Público)"):::execucao
+        H("Passo 5: Criar Regra de Desligamento (Fixo em eastus)"):::execucao
+        I("Passo 6: Criar IP Público Standard"):::execucao
+        J("Passo 7: Obter Nome da NIC Dinâmica e Associar IP Público"):::execucao
+        K("Passo 8: Criar Regra NSG (Liberar Portas 80 a 85)"):::execucao
         
         E --> F --> G --> H --> I --> J --> K
     end
