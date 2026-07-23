@@ -29,11 +29,11 @@ az provider show --namespace Microsoft.DevTestLab --query "resourceTypes[?resour
 # Parte 2: Criação da Infraestrutura (Execução)
 # Definindo Variáveis para não ter que digitar repetido (Altere se necessário)
 ```bash
-REGIAO="eastus3"
+REGIAO="denmarkeast"
 RG="RG-App-Novo"
 VM_NOME="VirtualMachine"
-VNET="vnet-app-b"
-SUBNET="snet-app-b"
+VNET="vnet-denmark-b"
+SUBNET="snet-denmark-b"
 ```
 
 # Passo 3: Criar o grupo de recurso
